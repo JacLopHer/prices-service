@@ -1,14 +1,5 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
-springdoc:
+  profiles:
+    active: TO_BE_SET
   swagger-ui:
     url: /v3/api-docs.yaml

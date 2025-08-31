@@ -84,4 +84,79 @@ El proyecto está dividido en 6 módulos, cada uno con una responsabilidad clara
 
 ---
 
+# Perfiles de Spring Boot
+
+Este proyecto soporta varios perfiles de configuración para adaptarse a diferentes entornos:
+
+- **local**: Desarrollo local con H2 y consola habilitada. Archivo en `src/main/resources/application-local.yml`.
+- **test**: Ejecución de tests con H2 y consola deshabilitada. Archivo en `src/test/resources/application-test.yml` (se usa automáticamente en los tests).
+- **dev** y **prod**: Entornos de desarrollo y producción con PostgreSQL. Los archivos `application-dev.yml` y `application-prod.yml` usan variables de entorno para la configuración:
+
+```yaml
+spring:
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+  jpa:
+    database-platform: ${JPA_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
+```
+
+Debes definir las variables de entorno antes de arrancar la aplicación, por ejemplo:
+
+**En Linux/Mac:**
+```sh
+export DB_URL=jdbc:postgresql://localhost:5432/pricesdb
+export DB_USER=usuario
+export DB_PASS=contraseña
+```
+
+**En Windows:**
+```cmd
+set DB_URL=jdbc:postgresql://localhost:5432/pricesdb
+set DB_USER=usuario
+set DB_PASS=contraseña
+```
+
+**En Docker/CI/CD:**
+Configura las variables en el entorno del contenedor o pipeline.
+
+Esto permite cambiar credenciales y endpoints sin modificar los archivos de configuración.
+
+## Perfil por defecto
+
+Si ejecutas la aplicación **sin especificar ningún perfil**, se usará automáticamente el perfil `dev` (ver `spring.profiles.active` en `application.yml`).
+
+Puedes cambiar el perfil por defecto editando la propiedad en `application.yml`:
+```yaml
+spring:
+  profiles:
+    active: prod
+```
+
+**Recomendación profesional:**
+- Mantén siempre un perfil por defecto para evitar errores de configuración.
+- En producción, define el perfil mediante variable de entorno `SPRING_PROFILES_ACTIVE=prod` para mayor seguridad.
+
+Para activar un perfil en ejecución local, usa el parámetro:
+
+```sh
+-Dspring.profiles.active=local
+```
+
+Ejemplo para desarrollo local:
+```sh
+mvn spring-boot:run -pl prices-boot -Dspring-boot.run.profiles=local
+```
+
+En los tests, el perfil `test` y la configuración de H2 se aplican automáticamente gracias a la ubicación de `application-test.yml` en `src/test/resources`. Si necesitas forzar el perfil en una clase de test, puedes usar:
+```java
+@ActiveProfiles("test")
+```
+
+La configuración común está en `application.yml`.
+
+---
+
 Para cualquier pregunta sobre la arquitectura, decisiones o extensiones, consulte este README o contacte al equipo técnico.
