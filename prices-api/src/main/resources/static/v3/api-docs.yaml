@@ -30,9 +30,9 @@ paths:
           in: query
           required: true
           description: Product identifier
-          example: 35455
           schema:
             type: integer
+            example: 35455
         - name: brandId
           in: query
           required: true

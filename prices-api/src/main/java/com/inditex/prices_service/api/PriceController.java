@@ -47,6 +47,7 @@ public class PriceController {
     public ResponseEntity<PriceDto> getPriceByDateProductBrand(
             @Parameter(description = "Date and time for price lookup", example = "2020-06-14T10:00:00+02:00", required = true)
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date,
+            @Parameter(description = "Product identifier", example = "35455", required = true)
             @RequestParam("productId") int productId,
             @Parameter(description = "Brand identifier", example = "1", required = true)
             @RequestParam("brandId") int brandId) {
