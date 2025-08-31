@@ -1,75 +1,87 @@
 # Prices Service - Hexagonal Architecture
 
-This project is a technical test for price management, implemented with a professional hexagonal architecture using Spring Boot and Maven multi-module.
+Este proyecto es una prueba técnica para la gestión de precios, implementada con arquitectura hexagonal profesional usando Spring Boot y Maven multi-módulo.
 
-## Module Structure
+## Estructura de Módulos
 
-The project is divided into 6 modules, each with a clear responsibility:
+El proyecto está dividido en 6 módulos, cada uno con una responsabilidad clara:
 
-- **prices-domain**: Domain core. Contains business entities and ports (interfaces). No external dependencies.
-- **prices-application**: Application services and use cases. Orchestrates business logic using domain ports. Depends on `prices-domain` and Spring Boot Starter.
-- **prices-infrastructure**: Persistence adapters (JPA/H2), data initialization, and configuration. Depends on `prices-domain`, JPA, and H2.
-- **prices-api**: REST controllers and endpoint configuration. Depends on `prices-application` and `prices-shared`.
-- **prices-shared**: DTOs, mappers, utilities, and shared exceptions. Depends on `prices-domain` if DTOs/mappers use domain entities.
-- **prices-boot**: Main class and global configuration. Depends on all previous modules and Spring Boot Starter.
+- **prices-domain**: Dominio central. Contiene entidades de negocio y puertos (interfaces). Sin dependencias externas.
+- **prices-application**: Servicios y casos de uso de la aplicación. Orquesta la lógica de negocio usando los puertos del dominio. Depende de `prices-domain` y Spring Boot Starter.
+- **prices-infrastructure**: Adaptadores de persistencia (JPA/H2), inicialización de datos y configuración. Depende de `prices-domain`, JPA y H2.
+- **prices-api**: Controladores REST y configuración de endpoints. Depende de `prices-application` y `prices-shared`.
+- **prices-shared**: DTOs, mapeadores, utilidades y excepciones compartidas. Depende de `prices-domain` si los DTOs/mapeadores utilizan entidades del dominio.
+- **prices-boot**: Clase principal y configuración global. Depende de todos los módulos anteriores y de Spring Boot Starter.
 
-## Startup & Configuration
+## Inicio y Configuración
 
-- The main class is in `prices-boot` (`com.inditex.prices_service.boot.PricesServiceApplication`).
-- Component, JPA entity, and repository scanning is configured for all relevant packages.
-- The `application.properties` file and other resources are in `prices-boot/src/main/resources/`.
+- La clase principal se encuentra en `prices-boot` (`com.inditex.prices_service.boot.PricesServiceApplication`).
+- El escaneo de componentes, entidades JPA y repositorios está configurado para todos los paquetes relevantes.
+- El archivo `application.properties` y otros recursos están en `prices-boot/src/main/resources/`.
 
-## Main Endpoint
+## Endpoint Principal
 
 - **GET /prices**
-  - Parameters: `date` (ISO-8601), `productId`, `brandId`
-  - Example:
+  - Parámetros: `date` (ISO-8601 con zona horaria, ej: `2020-06-14T10:00:00+02:00`), `productId`, `brandId`
+  - Ejemplo:
     ```sh
-    curl "http://localhost:8080/prices?date=2020-06-14T10:00:00&productId=35455&brandId=1"
+    curl "http://localhost:8080/prices?date=2020-06-14T10:00:00+02:00&productId=35455&brandId=1"
     ```
-  - Example response:
+  - Ejemplo de respuesta:
     ```json
     {
       "productId": 35455,
       "brandId": 1,
       "priceList": 1,
-      "startDate": "2020-06-14T00:00:00",
-      "endDate": "2020-12-31T23:59:59",
+      "startDate": "2020-06-14T00:00:00+02:00",
+      "endDate": "2020-12-31T23:59:59+02:00",
       "price": 35.50,
-      "curr": "EUR"
+      "currency": "EUR"
     }
     ```
 
----
+### Casos de ejemplo y respuestas esperadas
 
-## Architectural Decisions & Best Practices
+| Fecha de consulta           | productId | brandId | priceList | startDate                | endDate                  | price  | currency |
+|----------------------------|-----------|---------|-----------|--------------------------|--------------------------|--------|----------|
+| 2020-06-14T10:00:00+02:00  | 35455     | 1       | 1         | 2020-06-14T00:00:00+02:00| 2020-12-31T23:59:59+02:00| 35.50  | EUR      |
+| 2020-06-14T16:00:00+02:00  | 35455     | 1       | 2         | 2020-06-14T15:00:00+02:00| 2020-06-14T18:30:00+02:00| 25.45  | EUR      |
+| 2020-06-14T21:00:00+02:00  | 35455     | 1       | 1         | 2020-06-14T00:00:00+02:00| 2020-12-31T23:59:59+02:00| 35.50  | EUR      |
+| 2020-06-15T10:00:00+02:00  | 35455     | 1       | 3         | 2020-06-15T00:00:00+02:00| 2020-06-15T11:00:00+02:00| 30.50  | EUR      |
+| 2020-06-16T21:00:00+02:00  | 35455     | 1       | 4         | 2020-06-15T16:00:00+02:00| 2020-12-31T23:59:59+02:00| 38.95  | EUR      |
 
-### Hexagonal Architecture
-- The domain and use cases do not depend on technical details or frameworks.
-- Input adapters (REST API) and output adapters (persistence) depend on the domain, never the other way around.
-- Domain interfaces (ports) decouple business logic from technical implementations.
-
-### Module Separation
-- Each module has a single responsibility and only depends on what is necessary.
-- No cyclic dependencies between modules.
-- Boot and integration tests are in `prices-boot`, which brings all modules together.
-
-### Testing Strategy
-- Unit tests are located in domain and application modules, testing business logic and use cases in isolation.
-- Integration tests are in `prices-boot`, starting the real Spring Boot context and validating integration between modules and adapters.
-- Mocks required for integration tests are defined in the boot module and marked as `@Primary` to avoid bean conflicts.
-
-### Best Practices
-- The main class exists only in `prices-boot`.
-- Test beans and configuration are properly isolated.
-- Use Spring profiles to separate test and production contexts.
-- Extend with TestContainers for integration tests with real databases.
-- The architecture is extensible and maintainable.
-
-### Extensibility & Quality
-- The project is ready for continuous integration (CI/CD) and automated validations.
-- Documentation and structure facilitate onboarding for new developers.
+> **Nota:** La base de datos H2 se inicializa automáticamente con los datos de ejemplo al arrancar la aplicación.
 
 ---
 
-For any questions about architecture, decisions, or extensions, refer to this README or contact the technical team.
+## Decisiones Arquitectónicas y Mejores Prácticas
+
+### Arquitectura Hexagonal
+- El dominio y los casos de uso no dependen de detalles técnicos o frameworks.
+- Los adaptadores de entrada (API REST) y los adaptadores de salida (persistencia) dependen del dominio, nunca al revés.
+- Las interfaces del dominio (puertos) desacoplan la lógica de negocio de las implementaciones técnicas.
+
+### Separación de Módulos
+- Cada módulo tiene una única responsabilidad y solo depende de lo que es necesario.
+- No hay dependencias cíclicas entre módulos.
+- Las pruebas de arranque e integración están en `prices-boot`, que reúne todos los módulos.
+
+### Estrategia de Pruebas
+- Las pruebas unitarias se encuentran en los módulos de dominio y aplicación, probando la lógica de negocio y los casos de uso en aislamiento.
+- Las pruebas de integración están en `prices-boot`, iniciando el verdadero contexto de Spring Boot y validando la integración entre módulos y adaptadores.
+- Los mocks requeridos para las pruebas de integración se definen en el módulo boot y se marcan como `@Primary` para evitar conflictos de beans.
+
+### Mejores Prácticas
+- La clase principal existe solo en `prices-boot`.
+- Los beans y la configuración de prueba están debidamente aislados.
+- Se utilizan perfiles de Spring para separar los contextos de prueba y producción.
+- Extender con TestContainers para pruebas de integración con bases de datos reales.
+- La arquitectura es extensible y mantenible.
+
+### Extensibilidad y Calidad
+- El proyecto está listo para la integración continua (CI/CD) y validaciones automáticas.
+- La documentación y la estructura facilitan la incorporación de nuevos desarrolladores.
+
+---
+
+Para cualquier pregunta sobre la arquitectura, decisiones o extensiones, consulte este README o contacte al equipo técnico.

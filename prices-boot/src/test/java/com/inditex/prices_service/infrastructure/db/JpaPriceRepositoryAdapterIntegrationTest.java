@@ -26,23 +26,102 @@ class JpaPriceRepositoryAdapterIntegrationTest {
     void setUp() {
         adapter = new JpaPriceRepositoryAdapter(springDataPriceRepository);
         springDataPriceRepository.deleteAll();
+        // Insertar los 4 precios de ejemplo
         PriceEntity entity1 = new PriceEntity();
         entity1.setBrandId(1);
-        entity1.setStartDate(OffsetDateTime.of(2020, 6, 14, 0, 0, 0, 0, ZoneOffset.UTC));
-        entity1.setEndDate(OffsetDateTime.of(2020, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC));
+        entity1.setStartDate(OffsetDateTime.of(2020, 6, 14, 0, 0, 0, 0, ZoneOffset.ofHours(2)));
+        entity1.setEndDate(OffsetDateTime.of(2020, 12, 31, 23, 59, 59, 0, ZoneOffset.ofHours(2)));
         entity1.setPriceList(1);
         entity1.setProductId(35455);
         entity1.setPriority(0);
         entity1.setPrice(new BigDecimal("35.50"));
         entity1.setCurr("EUR");
         springDataPriceRepository.save(entity1);
+
+        PriceEntity entity2 = new PriceEntity();
+        entity2.setBrandId(1);
+        entity2.setStartDate(OffsetDateTime.of(2020, 6, 14, 15, 0, 0, 0, ZoneOffset.ofHours(2)));
+        entity2.setEndDate(OffsetDateTime.of(2020, 6, 14, 18, 30, 0, 0, ZoneOffset.ofHours(2)));
+        entity2.setPriceList(2);
+        entity2.setProductId(35455);
+        entity2.setPriority(1);
+        entity2.setPrice(new BigDecimal("25.45"));
+        entity2.setCurr("EUR");
+        springDataPriceRepository.save(entity2);
+
+        PriceEntity entity3 = new PriceEntity();
+        entity3.setBrandId(1);
+        entity3.setStartDate(OffsetDateTime.of(2020, 6, 15, 0, 0, 0, 0, ZoneOffset.ofHours(2)));
+        entity3.setEndDate(OffsetDateTime.of(2020, 6, 15, 11, 0, 0, 0, ZoneOffset.ofHours(2)));
+        entity3.setPriceList(3);
+        entity3.setProductId(35455);
+        entity3.setPriority(1);
+        entity3.setPrice(new BigDecimal("30.50"));
+        entity3.setCurr("EUR");
+        springDataPriceRepository.save(entity3);
+
+        PriceEntity entity4 = new PriceEntity();
+        entity4.setBrandId(1);
+        entity4.setStartDate(OffsetDateTime.of(2020, 6, 15, 16, 0, 0, 0, ZoneOffset.ofHours(2)));
+        entity4.setEndDate(OffsetDateTime.of(2020, 12, 31, 23, 59, 59, 0, ZoneOffset.ofHours(2)));
+        entity4.setPriceList(4);
+        entity4.setProductId(35455);
+        entity4.setPriority(1);
+        entity4.setPrice(new BigDecimal("38.95"));
+        entity4.setCurr("EUR");
+        springDataPriceRepository.save(entity4);
     }
 
     @Test
     void shouldFindPriceByProductIdAndBrandId() {
-        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.UTC));
+        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isPresent(), "El precio debería existir");
         assertEquals(new BigDecimal("35.50"), result.get().getPrice());
+        assertEquals(1, result.get().getBrandId());
+        assertEquals(35455, result.get().getProductId());
+        assertEquals("EUR", result.get().getCurr());
+        assertEquals(1, result.get().getPriceList());
+    }
+
+    @Test
+    void shouldFindPriceAt2020_06_14_16_00() {
+        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2020, 6, 14, 16, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertTrue(result.isPresent(), "El precio debería existir");
+        assertEquals(new BigDecimal("25.45"), result.get().getPrice());
+        assertEquals(2, result.get().getPriceList());
+        assertEquals(1, result.get().getBrandId());
+        assertEquals(35455, result.get().getProductId());
+        assertEquals("EUR", result.get().getCurr());
+    }
+
+    @Test
+    void shouldFindPriceAt2020_06_14_21_00() {
+        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2020, 6, 14, 21, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertTrue(result.isPresent(), "El precio debería existir");
+        assertEquals(new BigDecimal("35.50"), result.get().getPrice());
+        assertEquals(1, result.get().getPriceList());
+        assertEquals(1, result.get().getBrandId());
+        assertEquals(35455, result.get().getProductId());
+        assertEquals("EUR", result.get().getCurr());
+    }
+
+    @Test
+    void shouldFindPriceAt2020_06_15_10_00() {
+        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2020, 6, 15, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertTrue(result.isPresent(), "El precio debería existir");
+        assertEquals(new BigDecimal("30.50"), result.get().getPrice());
+        assertEquals(3, result.get().getPriceList());
+        assertEquals(1, result.get().getBrandId());
+        assertEquals(35455, result.get().getProductId());
+        assertEquals("EUR", result.get().getCurr());
+    }
+
+    @Test
+    void shouldFindPriceAt2020_06_16_21_00() {
+        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2020, 6, 16, 21, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertTrue(result.isPresent(), "El precio debería existir");
+        assertEquals(new BigDecimal("38.95"), result.get().getPrice());
+        assertEquals(4, result.get().getPriceList());
         assertEquals(1, result.get().getBrandId());
         assertEquals(35455, result.get().getProductId());
         assertEquals("EUR", result.get().getCurr());
