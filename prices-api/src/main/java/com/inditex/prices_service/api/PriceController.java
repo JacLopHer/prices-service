@@ -1,39 +1,56 @@
 package com.inditex.prices_service.api;
 
 import com.inditex.prices_service.application.PriceService;
-import com.inditex.prices_service.domain.Price;
 import com.inditex.prices_service.shared.PriceDto;
-import com.inditex.prices_service.shared.PriceMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-
+/**
+ * REST controller for price queries by product, brand, and date.
+ */
 @RestController
-@RequestMapping("/prices")
 public class PriceController {
     private final PriceService priceService;
 
+    /**
+     * Constructs a PriceController with the given PriceService.
+     * @param priceService the service to retrieve price information
+     */
     public PriceController(PriceService priceService) {
         this.priceService = priceService;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getPrice(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
+    @GetMapping("/prices")
+    @Operation(
+        summary = "Get product price by date, product and brand",
+        description = "Returns the price for a given product and brand at a specific date. If no price is found, returns 404."
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Price found",
+            content = @Content(schema = @Schema(implementation = PriceDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Price not found"
+        )
+    })
+    public ResponseEntity<PriceDto> getPriceByDateProductBrand(
+            @Parameter(description = "Date and time for price lookup", example = "2020-06-14T10:00:00+02:00", required = true)
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date,
             @RequestParam("productId") int productId,
+            @Parameter(description = "Brand identifier", example = "1", required = true)
             @RequestParam("brandId") int brandId) {
-        try {
-            Price price = priceService.getPrice(productId, brandId, date);
-            PriceDto priceDto = PriceMapper.toDto(price);
-            return ResponseEntity.ok(priceDto);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+        PriceDto priceDto = priceService.getPrice(productId, brandId, date);
+        return ResponseEntity.ok(priceDto);
     }
 }

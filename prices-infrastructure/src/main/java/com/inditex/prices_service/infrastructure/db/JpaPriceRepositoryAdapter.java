@@ -4,7 +4,7 @@ import com.inditex.prices_service.domain.Price;
 import com.inditex.prices_service.domain.PriceRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -17,10 +17,17 @@ public class JpaPriceRepositoryAdapter implements PriceRepository {
     }
 
     @Override
-    public Optional<Price> findApplicablePrice(int productId, int brandId, LocalDateTime applicationDate) {
+    public Optional<Price> findApplicablePrice(int productId, int brandId, OffsetDateTime applicationDate) {
         return springDataPriceRepository.findApplicablePrices(productId, brandId, applicationDate)
                 .stream()
                 .max(Comparator.comparingInt(PriceEntity::getPriority))
+                .map(this::toDomain);
+    }
+
+    @Override
+    public Optional<Price> findById(Integer id) {
+        if (id == null) return Optional.empty();
+        return springDataPriceRepository.findById(id.longValue())
                 .map(this::toDomain);
     }
 
@@ -38,4 +45,3 @@ public class JpaPriceRepositoryAdapter implements PriceRepository {
         );
     }
 }
-

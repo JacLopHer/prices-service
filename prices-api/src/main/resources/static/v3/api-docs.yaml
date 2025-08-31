@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: Prices Service API
+  version: "1.0.0"
+  description: API for managing product prices at Inditex.
+  contact:
+    name: Inditex Team
+    email: support@inditex.com
+servers:
+  - url: http://localhost:8080
+paths:
+  /prices:
+    get:
+      tags:
+        - Prices
+      operationId: getPriceByDateProductBrand
+      summary: Get product price by date, product and brand
+      description: Returns the price for a given product and brand at a specific date. If no price is found, returns 404.
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: Date and time for price lookup
+          example: "2020-06-14T10:00:00+02:00"
+          schema:
+            type: string
+            format: date-time
+            x-java-type: java.time.LocalDateTime
+        - name: productId
+          in: query
+          required: true
+          description: Product identifier
+          example: 35455
+          schema:
+            type: integer
+        - name: brandId
+          in: query
+          required: true
+          description: Brand identifier
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Price found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceDto'
+              examples:
+                example-1:
+                  value:
+                    id: 1
+                    brandId: 1
+                    startDate: "2020-06-14T00:00:00"
+                    endDate: "2020-12-31T23:59:59"
+                    priceList: 1
+                    productId: 35455
+                    priority: 0
+                    price: 35.50
+                    curr: "EUR"
+        '404':
+          description: Price not found
+  /prices/{id}:
+    get:
+      tags:
+        - Prices
+      operationId: getPriceById
+      summary: Get price by ID
+      description: Returns the price for the given ID. If no price is found, returns 404.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Price identifier
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Price found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceDto'
+              examples:
+                example-1:
+                  value:
+                    id: 1
+                    brandId: 1
+                    startDate: "2020-06-14T00:00:00"
+                    endDate: "2020-12-31T23:59:59"
+                    priceList: 1
+                    productId: 35455
+                    priority: 0
+                    price: 35.50
+                    curr: "EUR"
+        '404':
+          description: Price not found
+components:
+  schemas:
+    PriceDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        brandId:
+          type: integer
+          example: 1
+        startDate:
+          type: string
+          format: date-time
+          example: "2020-06-14T00:00:00"
+        endDate:
+          type: string
+          format: date-time
+          example: "2020-12-31T23:59:59"
+        priceList:
+          type: integer
+          example: 1
+        productId:
+          type: integer
+          example: 35455
+        priority:
+          type: integer
+          example: 0
+        price:
+          type: number
+          format: double
+          example: 35.50
+        curr:
+          type: string
+          example: "EUR"

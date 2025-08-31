@@ -3,6 +3,8 @@ package com.inditex.prices_service.shared;
 import com.inditex.prices_service.domain.Price;
 
 public class PriceMapper {
+    private PriceMapper(){}
+
     public static PriceDto toDto(Price price) {
         if (price == null) return null;
         return new PriceDto(

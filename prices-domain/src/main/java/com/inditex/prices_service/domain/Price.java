@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,12 +13,11 @@ import java.time.LocalDateTime;
 public class Price {
     private Long id;
     private int brandId;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private OffsetDateTime startDate;
+    private OffsetDateTime endDate;
     private int priceList;
     private int productId;
     private int priority;
     private BigDecimal price;
     private String curr;
 }
-

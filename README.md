@@ -40,53 +40,36 @@ The project is divided into 6 modules, each with a clear responsibility:
     }
     ```
 
-## Recommended Integration Tests
+---
 
-Test the following cases to validate business logic:
+## Architectural Decisions & Best Practices
 
-1. **2020-06-14 10:00**
-   ```sh
-   curl "http://localhost:8080/prices?date=2020-06-14T10:00:00&productId=35455&brandId=1"
-   ```
-2. **2020-06-14 16:00**
-   ```sh
-   curl "http://localhost:8080/prices?date=2020-06-14T16:00:00&productId=35455&brandId=1"
-   ```
-3. **2020-06-14 21:00**
-   ```sh
-   curl "http://localhost:8080/prices?date=2020-06-14T21:00:00&productId=35455&brandId=1"
-   ```
-4. **2020-06-15 10:00**
-   ```sh
-   curl "http://localhost:8080/prices?date=2020-06-15T10:00:00&productId=35455&brandId=1"
-   ```
-5. **2020-06-16 21:00**
-   ```sh
-   curl "http://localhost:8080/prices?date=2020-06-16T21:00:00&productId=35455&brandId=1"
-   ```
+### Hexagonal Architecture
+- The domain and use cases do not depend on technical details or frameworks.
+- Input adapters (REST API) and output adapters (persistence) depend on the domain, never the other way around.
+- Domain interfaces (ports) decouple business logic from technical implementations.
 
-## How to Build and Run
+### Module Separation
+- Each module has a single responsibility and only depends on what is necessary.
+- No cyclic dependencies between modules.
+- Boot and integration tests are in `prices-boot`, which brings all modules together.
 
-1. Build the complete project:
-   ```sh
-   mvn clean install
-   ```
-2. Start the application from the `prices-boot` module:
-   ```sh
-   cd prices-boot
-   mvn spring-boot:run
-   ```
+### Testing Strategy
+- Unit tests are located in domain and application modules, testing business logic and use cases in isolation.
+- Integration tests are in `prices-boot`, starting the real Spring Boot context and validating integration between modules and adapters.
+- Mocks required for integration tests are defined in the boot module and marked as `@Primary` to avoid bean conflicts.
 
-## Best Practices Applied
+### Best Practices
+- The main class exists only in `prices-boot`.
+- Test beans and configuration are properly isolated.
+- Use Spring profiles to separate test and production contexts.
+- Extend with TestContainers for integration tests with real databases.
+- The architecture is extensible and maintainable.
 
-- Hexagonal architecture (ports and adapters).
-- Clear separation of responsibilities by module.
-- Centralized DTOs and mappers in `prices-shared`.
-- Decoupled startup in `prices-boot`.
-- Component, entity, and repository scanning configured.
-- Recommended integration tests.
-- Clean, professional, and scalable code.
+### Extensibility & Quality
+- The project is ready for continuous integration (CI/CD) and automated validations.
+- Documentation and structure facilitate onboarding for new developers.
 
-## Contact
+---
 
-For any technical questions, contact the responsible developer.
+For any questions about architecture, decisions, or extensions, refer to this README or contact the technical team.
