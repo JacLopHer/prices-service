@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for price queries by product, brand, and date.
  */
 @RestController
+@SuppressWarnings("unused")
 public class PriceController {
     private final PriceService priceService;
 
@@ -50,5 +51,13 @@ public class PriceController {
             @RequestParam("brandId") int brandId) {
         PriceDto priceDto = priceService.getPrice(productId, brandId, date);
         return ResponseEntity.ok(priceDto);
+    }
+
+    @ExceptionHandler(com.inditex.prices_service.application.PriceNotFoundException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.NOT_FOUND)
+    public java.util.Map<String, String> handlePriceNotFoundException(Exception ex) {
+        java.util.Map<String, String> error = new java.util.HashMap<>();
+        error.put("error", ex.getMessage());
+        return error;
     }
 }

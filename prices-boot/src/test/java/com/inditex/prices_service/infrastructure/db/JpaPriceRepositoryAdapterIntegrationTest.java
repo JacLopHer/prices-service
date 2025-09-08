@@ -15,6 +15,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = PricesServiceApplication.class, properties = "spring.sql.init.mode=never")
+@SuppressWarnings("unused")
 class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Autowired
@@ -125,5 +126,23 @@ class JpaPriceRepositoryAdapterIntegrationTest {
         assertEquals(1, result.get().getBrandId());
         assertEquals(35455, result.get().getProductId());
         assertEquals("EUR", result.get().getCurr());
+    }
+
+    @Test
+    void shouldReturnEmptyWhenNoPriceForDate() {
+        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertFalse(result.isPresent(), "No debería existir precio para esa fecha");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenProductDoesNotExist() {
+        Optional<Price> result = adapter.findApplicablePrice(99999, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertFalse(result.isPresent(), "No debería existir precio para producto inexistente");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenBrandDoesNotExist() {
+        Optional<Price> result = adapter.findApplicablePrice(35455, 99, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
+        assertFalse(result.isPresent(), "No debería existir precio para brand inexistente");
     }
 }

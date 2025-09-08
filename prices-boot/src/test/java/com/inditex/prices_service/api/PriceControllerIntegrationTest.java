@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = {com.inditex.prices_service.boot.PricesServiceApplication.class, PriceRepositoryTestConfig.class})
 @AutoConfigureMockMvc
+@SuppressWarnings("unused")
 class PriceControllerIntegrationTest {
 
     @Autowired
@@ -176,6 +177,6 @@ class PriceControllerIntegrationTest {
                 .param("productId", "99999")
                 .param("brandId", "1"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("No price found for the given parameters"));
+                .andExpect(jsonPath("$.error").value("No price found for the given parameters"));
     }
 }
