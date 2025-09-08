@@ -6,6 +6,7 @@
     <artifactId>prices-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>prices-domain</module>
         <module>prices-application</module>
@@ -14,9 +15,11 @@
         <module>prices-shared</module>
         <module>prices-boot</module>
     </modules>
+
     <properties>
         <java.version>17</java.version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -28,6 +31,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -46,6 +50,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -55,28 +60,8 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
-            </plugin>
-        </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>report-aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
+    <profiles>
+        <!-- Eliminado el perfil Jacoco para informes agregados -->
+    </profiles>
 </project>
