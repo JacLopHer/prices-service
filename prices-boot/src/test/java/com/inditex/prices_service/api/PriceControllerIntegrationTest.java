@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = {com.inditex.prices_service.boot.PricesServiceApplication.class, PriceRepositoryTestConfig.class})
 @AutoConfigureMockMvc
+@SuppressWarnings("unused")
 class PriceControllerIntegrationTest {
 
     @Autowired
@@ -176,6 +177,18 @@ class PriceControllerIntegrationTest {
                 .param("productId", "99999")
                 .param("brandId", "1"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("No price found for the given parameters"));
+                .andExpect(jsonPath("$.error").value("No price found for the given parameters"));
+    }
+
+    @Test
+    void shouldReturn404WhenPriceNotFound() throws Exception {
+        Mockito.when(priceRepository.findApplicablePrice(99999, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
+            .thenReturn(java.util.Optional.empty());
+        mockMvc.perform(get("/prices")
+                .param("date", "2020-06-14T10:00:00+02:00")
+                .param("productId", "99999")
+                .param("brandId", "1"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.error").exists());
     }
 }

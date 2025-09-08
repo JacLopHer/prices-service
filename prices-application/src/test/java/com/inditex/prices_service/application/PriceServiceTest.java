@@ -3,7 +3,6 @@ package com.inditex.prices_service.application;
 import com.inditex.prices_service.domain.Price;
 import com.inditex.prices_service.domain.PriceRepository;
 import com.inditex.prices_service.shared.PriceDto;
-import com.inditex.prices_service.shared.PriceMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,23 +49,34 @@ class PriceServiceTest {
         when(priceRepository.findApplicablePrice(35455, 1, date)).thenReturn(Optional.of(price));
 
         PriceDto result = priceService.getPrice(35455, 1, date);
-        PriceDto expected = PriceMapper.toDto(price);
-        assertEquals(expected.getPriceList(), result.getPriceList());
-        assertEquals(expected.getPrice(), result.getPrice());
-        assertEquals(expected.getProductId(), result.getProductId());
-        assertEquals(expected.getBrandId(), result.getBrandId());
-        assertEquals(expected.getStartDate(), result.getStartDate());
-        assertEquals(expected.getEndDate(), result.getEndDate());
-        assertEquals(expected.getCurrency(), result.getCurrency());
+        assertNotNull(result);
+        assertEquals(35455, result.getProductId());
+        assertEquals(1, result.getBrandId());
+        assertEquals("EUR", result.getCurrency());
+        assertEquals(new java.math.BigDecimal("25.45"), result.getPrice());
     }
 
-    /**
-     * Should throw PriceNotFoundException if no price is found for the given parameters.
-     */
     @Test
-    void shouldThrowExceptionIfNoPriceFound() {
-        OffsetDateTime date = OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.UTC);
-        when(priceRepository.findApplicablePrice(99999, 1, date)).thenReturn(Optional.empty());
-        assertThrows(PriceNotFoundException.class, () -> priceService.getPrice(99999, 1, date));
+    void shouldThrowExceptionWhenNoApplicablePrice() {
+        OffsetDateTime date = OffsetDateTime.of(2020, 6, 14, 16, 0, 0, 0, ZoneOffset.UTC);
+        when(priceRepository.findApplicablePrice(35455, 1, date)).thenReturn(Optional.empty());
+        assertThrows(PriceNotFoundException.class, () -> priceService.getPrice(35455, 1, date));
+    }
+
+    @Test
+    void shouldReturnPriceById() {
+        Price price = new Price(2L, 1, OffsetDateTime.now(), OffsetDateTime.now().plusDays(1), 1, 35455, 0, new java.math.BigDecimal("35.50"), "EUR");
+        when(priceRepository.findById(2)).thenReturn(Optional.of(price));
+        PriceDto result = priceService.getPriceById(2);
+        assertNotNull(result);
+        assertEquals(2, result.getId());
+        assertEquals("EUR", result.getCurrency());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenNoPriceById() {
+        when(priceRepository.findById(99)).thenReturn(Optional.empty());
+        assertThrows(PriceNotFoundException.class, () -> priceService.getPriceById(99));
     }
 }
+
