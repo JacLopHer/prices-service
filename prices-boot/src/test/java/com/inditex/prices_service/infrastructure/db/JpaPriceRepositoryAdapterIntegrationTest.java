@@ -23,6 +23,8 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     private JpaPriceRepositoryAdapter adapter;
 
+    private Long firstPriceId;
+
     @BeforeEach
     void setUp() {
         adapter = new JpaPriceRepositoryAdapter(springDataPriceRepository);
@@ -37,7 +39,8 @@ class JpaPriceRepositoryAdapterIntegrationTest {
         entity1.setPriority(0);
         entity1.setPrice(new BigDecimal("35.50"));
         entity1.setCurr("EUR");
-        springDataPriceRepository.save(entity1);
+        PriceEntity savedEntity1 = springDataPriceRepository.save(entity1);
+        firstPriceId = savedEntity1.getId();
 
         PriceEntity entity2 = new PriceEntity();
         entity2.setBrandId(1);
@@ -137,12 +140,41 @@ class JpaPriceRepositoryAdapterIntegrationTest {
     @Test
     void shouldReturnEmptyWhenProductDoesNotExist() {
         Optional<Price> result = adapter.findApplicablePrice(99999, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
-        assertFalse(result.isPresent(), "No debería existir precio para producto inexistente");
+        assertTrue(result.isEmpty(), "No debería existir precio aplicable");
     }
 
     @Test
     void shouldReturnEmptyWhenBrandDoesNotExist() {
         Optional<Price> result = adapter.findApplicablePrice(35455, 99, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertFalse(result.isPresent(), "No debería existir precio para brand inexistente");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenFindByIdWithNull() {
+        Optional<Price> result = adapter.findById(null);
+        assertTrue(result.isEmpty(), "No debería existir precio para id nulo");
+    }
+
+    @Test
+    void shouldReturnPriceWhenFindByIdWithExistingId() {
+        Optional<Price> result = adapter.findById(firstPriceId.intValue());
+        assertTrue(result.isPresent(), "Debe devolver el precio si el id existe");
+        assertEquals(new BigDecimal("35.50"), result.get().getPrice());
+        assertEquals(1, result.get().getBrandId());
+        assertEquals(35455, result.get().getProductId());
+        assertEquals("EUR", result.get().getCurr());
+    }
+
+    @Test
+    void shouldReturnEmptyWhenFindByIdWithNonExistingId() {
+        Optional<Price> result = adapter.findById(99999);
+        assertTrue(result.isEmpty(), "No debería existir precio para id inexistente");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenFindByIdWithValidId() {
+        Optional<Price> result = adapter.findById(firstPriceId.intValue());
+        assertTrue(result.isPresent(), "El precio debería existir por id");
+        assertEquals(firstPriceId, result.get().getId());
     }
 }

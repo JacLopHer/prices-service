@@ -79,3 +79,4 @@ class PriceServiceTest {
         assertThrows(PriceNotFoundException.class, () -> priceService.getPriceById(99));
     }
 }
+

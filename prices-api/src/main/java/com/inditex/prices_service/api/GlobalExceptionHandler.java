@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador global para manejo de excepciones en la API.
+ */
 @ControllerAdvice
 @SuppressWarnings("unused")
 public class GlobalExceptionHandler {
@@ -22,4 +25,3 @@ public class GlobalExceptionHandler {
         return error;
     }
 }
-
