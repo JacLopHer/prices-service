@@ -18,6 +18,8 @@ public class Price {
     private int priceList;
     private int productId;
     private int priority;
+    // The field 'price' represents the final sale price according to the business model and client requirements.
+    @SuppressWarnings("squid:S1700")
     private BigDecimal price;
     private String curr;
 }

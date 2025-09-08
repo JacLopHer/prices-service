@@ -8,6 +8,7 @@ public class PriceMapper {
     public static PriceDto toDto(Price price) {
         if (price == null) return null;
         return new PriceDto(
+            price.getId(),
             price.getProductId(),
             price.getBrandId(),
             price.getPriceList(),
@@ -18,4 +19,3 @@ public class PriceMapper {
         );
     }
 }
-

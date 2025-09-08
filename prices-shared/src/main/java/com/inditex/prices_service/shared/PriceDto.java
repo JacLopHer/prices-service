@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 @Getter
 @AllArgsConstructor
 public class PriceDto {
+    private Long id;
     private int productId;
     private int brandId;
     private int priceList;
