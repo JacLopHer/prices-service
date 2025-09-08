@@ -1,12 +1,14 @@
 package com.inditex.prices_service.infrastructure.db;
 
 import com.inditex.prices_service.domain.Price;
+import com.inditex.prices_service.domain.PriceSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,19 +27,21 @@ class JpaPriceRepositoryAdapterTest {
     }
 
     @Test
-    void findApplicablePriceShouldReturnPrice() {
-        Mockito.when(springDataPriceRepository.findFirstByProductIdAndBrandIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(anyInt(), anyInt(), any(), any()))
-                .thenReturn(Optional.of(entity));
-        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.now());
+    void findCandidatesShouldReturnApplicablePrice() {
+        Mockito.when(springDataPriceRepository.findByProductIdAndBrandIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(anyInt(), anyInt(), any(), any()))
+                .thenReturn(List.of(entity));
+        List<Price> candidates = adapter.findCandidates(35455, 1, OffsetDateTime.now());
+        Optional<Price> result = PriceSelector.selectApplicable(candidates);
         assertTrue(result.isPresent());
         assertEquals(entity.getId(), result.get().getId());
     }
 
     @Test
-    void findApplicablePriceShouldReturnEmpty() {
-        Mockito.when(springDataPriceRepository.findFirstByProductIdAndBrandIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(anyInt(), anyInt(), any(), any()))
-                .thenReturn(Optional.empty());
-        Optional<Price> result = adapter.findApplicablePrice(35455, 1, OffsetDateTime.now());
+    void findCandidatesShouldReturnEmpty() {
+        Mockito.when(springDataPriceRepository.findByProductIdAndBrandIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(anyInt(), anyInt(), any(), any()))
+                .thenReturn(List.of());
+        List<Price> candidates = adapter.findCandidates(35455, 1, OffsetDateTime.now());
+        Optional<Price> result = PriceSelector.selectApplicable(candidates);
         assertTrue(result.isEmpty());
     }
 
