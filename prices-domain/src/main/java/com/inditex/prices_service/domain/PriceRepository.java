@@ -5,5 +5,4 @@ import java.util.Optional;
 
 public interface PriceRepository {
     Optional<Price> findApplicable(int productId, int brandId, OffsetDateTime applicationDate);
-    Optional<Price> findById(Integer id);
 }

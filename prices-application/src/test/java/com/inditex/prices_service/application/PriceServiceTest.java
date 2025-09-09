@@ -62,20 +62,4 @@ class PriceServiceTest {
         when(priceRepository.findApplicable(35455, 1, date)).thenReturn(Optional.empty());
         assertThrows(PriceNotFoundException.class, () -> priceService.getPrice(35455, 1, date));
     }
-
-    @Test
-    void shouldReturnPriceById() {
-        Price price = new Price(2L, 1, OffsetDateTime.now(), OffsetDateTime.now().plusDays(1), 1, 35455, 0, new java.math.BigDecimal("35.50"), "EUR");
-        when(priceRepository.findById(2)).thenReturn(Optional.of(price));
-        PriceDto result = priceService.getPriceById(2);
-        assertNotNull(result);
-        assertEquals(2, result.getId());
-        assertEquals("EUR", result.getCurrency());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenNoPriceById() {
-        when(priceRepository.findById(99)).thenReturn(Optional.empty());
-        assertThrows(PriceNotFoundException.class, () -> priceService.getPriceById(99));
-    }
 }

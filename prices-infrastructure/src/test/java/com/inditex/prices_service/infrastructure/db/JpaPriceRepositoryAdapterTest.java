@@ -40,25 +40,4 @@ class JpaPriceRepositoryAdapterTest {
         Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.now());
         assertTrue(result.isEmpty());
     }
-
-    @Test
-    void findByIdShouldReturnPrice() {
-        Mockito.when(springDataPriceRepository.findById(1L)).thenReturn(Optional.of(entity));
-        Optional<Price> result = adapter.findById(1);
-        assertTrue(result.isPresent());
-        assertEquals(entity.getId(), result.get().getId());
-    }
-
-    @Test
-    void findByIdShouldReturnEmptyForNull() {
-        Optional<Price> result = adapter.findById(null);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findByIdShouldReturnEmptyForNonexistentId() {
-        Mockito.when(springDataPriceRepository.findById(anyLong())).thenReturn(Optional.empty());
-        Optional<Price> result = adapter.findById(999);
-        assertTrue(result.isEmpty());
-    }
 }

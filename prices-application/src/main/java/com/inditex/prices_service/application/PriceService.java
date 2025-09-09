@@ -36,16 +36,4 @@ public class PriceService {
                 .orElseThrow(() -> new PriceNotFoundException("No price found for the given parameters"));
         return PriceMapper.toDto(price);
     }
-
-    /**
-     * Retrieves the price for the given price ID.
-     * @param id the price identifier
-     * @return the price data transfer object
-     * @throws PriceNotFoundException if no price is found for the given ID
-     */
-    public PriceDto getPriceById(Integer id) {
-        Price price = priceRepository.findById(id)
-            .orElseThrow(() -> new PriceNotFoundException("No price found for id: " + id));
-        return PriceMapper.toDto(price);
-    }
 }

@@ -22,14 +22,6 @@ public class JpaPriceRepositoryAdapter implements PriceRepository {
             .map(this::toDomain);
     }
 
-
-    @Override
-    public Optional<Price> findById(Integer id) {
-        if (id == null) return Optional.empty();
-        return springDataPriceRepository.findById(id.longValue())
-                .map(this::toDomain);
-    }
-
     private Price toDomain(PriceEntity entity) {
         return new Price(
                 entity.getId(),
