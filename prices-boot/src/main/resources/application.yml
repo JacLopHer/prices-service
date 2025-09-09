@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: TO_BE_SET
   swagger-ui:
     url: /v3/api-docs.yaml
   datasource:
@@ -17,4 +15,5 @@ spring:
     port: 6379
     # TTL for cache entries in milliseconds (e.g., 10 minutes)
     time-to-live: 600000
+perfil: TO_BE_SET
 # Redis cache configuration for @Cacheable support. TTL is set to 10 minutes for price queries.
