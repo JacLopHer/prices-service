@@ -12,6 +12,7 @@ import com.inditex.prices_service.domain.PriceRepository;
 import com.inditex.prices_service.domain.Price;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,8 +31,8 @@ class PriceControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         Mockito.reset(priceRepository);
-        Mockito.when(priceRepository.findCandidates(35455, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
-            .thenReturn(java.util.List.of(new Price(
+        Mockito.when(priceRepository.findApplicable(35455, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
+            .thenReturn(Optional.of(new Price(
                 1L,
                 1,
                 OffsetDateTime.parse("2020-06-14T00:00:00+02:00"),
@@ -42,8 +43,8 @@ class PriceControllerIntegrationTest {
                 new BigDecimal("35.50"),
                 "EUR"
             )));
-        Mockito.when(priceRepository.findCandidates(35455, 1, OffsetDateTime.parse("2020-06-14T16:00:00+02:00")))
-            .thenReturn(java.util.List.of(new Price(
+        Mockito.when(priceRepository.findApplicable(35455, 1, OffsetDateTime.parse("2020-06-14T16:00:00+02:00")))
+            .thenReturn(Optional.of(new Price(
                 2L,
                 1,
                 OffsetDateTime.parse("2020-06-14T15:00:00+02:00"),
@@ -54,8 +55,8 @@ class PriceControllerIntegrationTest {
                 new BigDecimal("25.45"),
                 "EUR"
             )));
-        Mockito.when(priceRepository.findCandidates(35455, 1, OffsetDateTime.parse("2020-06-14T21:00:00+02:00")))
-            .thenReturn(java.util.List.of(new Price(
+        Mockito.when(priceRepository.findApplicable(35455, 1, OffsetDateTime.parse("2020-06-14T21:00:00+02:00")))
+            .thenReturn(Optional.of(new Price(
                 3L,
                 1,
                 OffsetDateTime.parse("2020-06-14T00:00:00+02:00"),
@@ -66,8 +67,8 @@ class PriceControllerIntegrationTest {
                 new BigDecimal("35.50"),
                 "EUR"
             )));
-        Mockito.when(priceRepository.findCandidates(35455, 1, OffsetDateTime.parse("2020-06-15T10:00:00+02:00")))
-            .thenReturn(java.util.List.of(new Price(
+        Mockito.when(priceRepository.findApplicable(35455, 1, OffsetDateTime.parse("2020-06-15T10:00:00+02:00")))
+            .thenReturn(Optional.of(new Price(
                 4L,
                 1,
                 OffsetDateTime.parse("2020-06-15T00:00:00+02:00"),
@@ -78,8 +79,8 @@ class PriceControllerIntegrationTest {
                 new BigDecimal("30.50"),
                 "EUR"
             )));
-        Mockito.when(priceRepository.findCandidates(35455, 1, OffsetDateTime.parse("2020-06-16T21:00:00+02:00")))
-            .thenReturn(java.util.List.of(new Price(
+        Mockito.when(priceRepository.findApplicable(35455, 1, OffsetDateTime.parse("2020-06-16T21:00:00+02:00")))
+            .thenReturn(Optional.of(new Price(
                 5L,
                 1,
                 OffsetDateTime.parse("2020-06-15T16:00:00+02:00"),
@@ -90,8 +91,8 @@ class PriceControllerIntegrationTest {
                 new BigDecimal("38.95"),
                 "EUR"
             )));
-        Mockito.when(priceRepository.findCandidates(99999, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
-            .thenReturn(java.util.List.of());
+        Mockito.when(priceRepository.findApplicable(99999, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
+            .thenReturn(Optional.empty());
     }
 
     @Test
@@ -184,8 +185,8 @@ class PriceControllerIntegrationTest {
 
     @Test
     void shouldReturn404WhenPriceNotFound() throws Exception {
-        Mockito.when(priceRepository.findCandidates(99999, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
-            .thenReturn(java.util.List.of());
+        Mockito.when(priceRepository.findApplicable(99999, 1, OffsetDateTime.parse("2020-06-14T10:00:00+02:00")))
+            .thenReturn(Optional.empty());
         mockMvc.perform(get("/prices")
                 .param("date", "2020-06-14T10:00:00+02:00")
                 .param("productId", "99999")

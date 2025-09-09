@@ -2,7 +2,6 @@ package com.inditex.prices_service.infrastructure.db;
 
 import com.inditex.prices_service.boot.PricesServiceApplication;
 import com.inditex.prices_service.domain.Price;
-import com.inditex.prices_service.domain.PriceSelector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,8 +78,7 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Test
     void shouldFindPriceByProductIdAndBrandId() {
-        var candidates = adapter.findCandidates(35455, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isPresent(), "El precio debería existir");
         assertEquals(new BigDecimal("35.50"), result.get().getPrice());
         assertEquals(1, result.get().getBrandId());
@@ -91,8 +89,7 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Test
     void shouldFindPriceAt2020_06_14_16_00() {
-        var candidates = adapter.findCandidates(35455, 1, OffsetDateTime.of(2020, 6, 14, 16, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.of(2020, 6, 14, 16, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isPresent(), "El precio debería existir");
         assertEquals(new BigDecimal("25.45"), result.get().getPrice());
         assertEquals(2, result.get().getPriceList());
@@ -103,8 +100,7 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Test
     void shouldFindPriceAt2020_06_14_21_00() {
-        var candidates = adapter.findCandidates(35455, 1, OffsetDateTime.of(2020, 6, 14, 21, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.of(2020, 6, 14, 21, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isPresent(), "El precio debería existir");
         assertEquals(new BigDecimal("35.50"), result.get().getPrice());
         assertEquals(1, result.get().getPriceList());
@@ -115,8 +111,7 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Test
     void shouldFindPriceAt2020_06_15_10_00() {
-        var candidates = adapter.findCandidates(35455, 1, OffsetDateTime.of(2020, 6, 15, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.of(2020, 6, 15, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isPresent(), "El precio debería existir");
         assertEquals(new BigDecimal("30.50"), result.get().getPrice());
         assertEquals(3, result.get().getPriceList());
@@ -127,8 +122,7 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Test
     void shouldFindPriceAt2020_06_16_21_00() {
-        var candidates = adapter.findCandidates(35455, 1, OffsetDateTime.of(2020, 6, 16, 21, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.of(2020, 6, 16, 21, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isPresent(), "El precio debería existir");
         assertEquals(new BigDecimal("38.95"), result.get().getPrice());
         assertEquals(4, result.get().getPriceList());
@@ -139,22 +133,19 @@ class JpaPriceRepositoryAdapterIntegrationTest {
 
     @Test
     void shouldReturnEmptyWhenNoPriceForDate() {
-        var candidates = adapter.findCandidates(35455, 1, OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 1, OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertFalse(result.isPresent(), "No debería existir precio para esa fecha");
     }
 
     @Test
     void shouldReturnEmptyWhenProductDoesNotExist() {
-        var candidates = adapter.findCandidates(99999, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(99999, 1, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertTrue(result.isEmpty(), "No debería existir precio aplicable");
     }
 
     @Test
     void shouldReturnEmptyWhenBrandDoesNotExist() {
-        var candidates = adapter.findCandidates(35455, 99, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
-        Optional<Price> result = PriceSelector.selectApplicable(candidates);
+        Optional<Price> result = adapter.findApplicable(35455, 99, OffsetDateTime.of(2020, 6, 14, 10, 0, 0, 0, ZoneOffset.ofHours(2)));
         assertFalse(result.isPresent(), "No debería existir precio para brand inexistente");
     }
 
