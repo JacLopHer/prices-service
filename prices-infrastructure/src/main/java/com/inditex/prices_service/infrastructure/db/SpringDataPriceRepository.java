@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface SpringDataPriceRepository extends JpaRepository<PriceEntity, Long> {
 
-    @Query(value = "SELECT * FROM prices WHERE product_id = :productId AND brand_id = :brandId AND :applicationDate BETWEEN start_date AND end_date ORDER BY priority DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM prices WHERE product_id = :productId AND brand_id = :brandId AND start_date <= :applicationDate AND end_date >= :applicationDate ORDER BY priority DESC LIMIT 1", nativeQuery = true)
     Optional<PriceEntity> findBestCandidate(
         @Param("productId") int productId,
         @Param("brandId") int brandId,
