@@ -12,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,7 +46,7 @@ class PriceServiceTest {
     void shouldReturnApplicablePrice() {
         OffsetDateTime date = OffsetDateTime.of(2020, 6, 14, 16, 0, 0, 0, ZoneOffset.UTC);
         Price price = new Price(1L, 1, date.minusHours(1), date.plusHours(2), 2, 35455, 1, new java.math.BigDecimal("25.45"), "EUR");
-        when(priceRepository.findCandidates(35455, 1, date)).thenReturn(List.of(price));
+        when(priceRepository.findApplicable(35455, 1, date)).thenReturn(Optional.of(price));
 
         PriceDto result = priceService.getPrice(35455, 1, date);
         assertNotNull(result);
@@ -60,23 +59,7 @@ class PriceServiceTest {
     @Test
     void shouldThrowExceptionWhenNoApplicablePrice() {
         OffsetDateTime date = OffsetDateTime.of(2020, 6, 14, 16, 0, 0, 0, ZoneOffset.UTC);
-        when(priceRepository.findCandidates(35455, 1, date)).thenReturn(List.of());
+        when(priceRepository.findApplicable(35455, 1, date)).thenReturn(Optional.empty());
         assertThrows(PriceNotFoundException.class, () -> priceService.getPrice(35455, 1, date));
-    }
-
-    @Test
-    void shouldReturnPriceById() {
-        Price price = new Price(2L, 1, OffsetDateTime.now(), OffsetDateTime.now().plusDays(1), 1, 35455, 0, new java.math.BigDecimal("35.50"), "EUR");
-        when(priceRepository.findById(2)).thenReturn(Optional.of(price));
-        PriceDto result = priceService.getPriceById(2);
-        assertNotNull(result);
-        assertEquals(2, result.getId());
-        assertEquals("EUR", result.getCurrency());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenNoPriceById() {
-        when(priceRepository.findById(99)).thenReturn(Optional.empty());
-        assertThrows(PriceNotFoundException.class, () -> priceService.getPriceById(99));
     }
 }
