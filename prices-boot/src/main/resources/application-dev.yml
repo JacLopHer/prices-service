@@ -6,4 +6,4 @@ spring:
     password: ${DB_PASS}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
+perfil: dev
