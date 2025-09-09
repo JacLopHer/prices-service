@@ -15,8 +15,7 @@ CREATE INDEX IF NOT EXISTS idx_prices_brand_id ON prices(brand_id);
 CREATE INDEX IF NOT EXISTS idx_prices_start_date ON prices(start_date);
 CREATE INDEX IF NOT EXISTS idx_prices_end_date ON prices(end_date);
 CREATE INDEX IF NOT EXISTS idx_prices_priority ON prices(priority);
-CREATE INDEX IF NOT EXISTS idx_prices_search
-ON prices(product_id, brand_id, start_date, end_date, priority DESC);
+-- Removed composite index idx_prices_search as it does not efficiently support the date range query pattern
 
 INSERT INTO prices (id, brand_id, start_date, end_date, price_list, product_id, priority, price, curr) VALUES
 (1, 1, '2020-06-14T00:00:00+02:00', '2020-12-31T23:59:59+02:00', 1, 35455, 0, 35.50, 'EUR'),
