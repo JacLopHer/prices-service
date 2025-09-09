@@ -121,6 +121,18 @@ prices-service/
 - **Can I change the database?** Yes, by modifying the configuration in `prices-boot/src/main/resources/application.yml`.
 - **How do I add new endpoints?** Add controllers in the `prices-api` module and use cases in `prices-application`.
 
+## Efficiency and Scalability
+
+**Composite indexes:** The `prices` table includes a composite index on the fields `product_id`, `brand_id`, `start_date`, `end_date`, `priority DESC` to optimize the main query. Check its usage with `EXPLAIN` in your database.
+
+**Connection pool:** Configured in `application.yml` to support high concurrency. Adjust the values according to your environment and expected load.
+
+**Read cache:** If prices change infrequently and access is very frequent, consider integrating Redis and using `@Cacheable` in the service to reduce database load.
+
+**Monitoring:** Use Spring Actuator, Prometheus, and Grafana to monitor performance and adjust parameters as the table grows and usage patterns change.
+
+**Filtering logic:** Keep selection logic in SQL, not in Java, to avoid unnecessary in-memory calculations and improve efficiency.
+
 ## References & Resources
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Maven Documentation](https://maven.apache.org/)

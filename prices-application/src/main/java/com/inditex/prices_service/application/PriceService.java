@@ -5,6 +5,7 @@ import com.inditex.prices_service.domain.Price;
 import com.inditex.prices_service.shared.PriceDto;
 import com.inditex.prices_service.shared.PriceMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.OffsetDateTime;
 
@@ -31,6 +32,7 @@ public class PriceService {
      * @return the price data transfer object
      * @throws PriceNotFoundException if no price is found for the given parameters
      */
+    @Cacheable(value = "prices", key = "#productId + '-' + #brandId + '-' + #applicationDate.toString()")
     public PriceDto getPrice(int productId, int brandId, OffsetDateTime applicationDate) {
         Price price = priceRepository.findApplicable(productId, brandId, applicationDate)
                 .orElseThrow(() -> new PriceNotFoundException("No price found for the given parameters"));
